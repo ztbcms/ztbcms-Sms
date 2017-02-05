@@ -8,7 +8,7 @@ return array(
 	//模块简介
 	'introduce' => '短信模块',
 	//模块介绍地址
-	'address' => 'http://ztbcms.com',
+	'address' => 'http://doc.ztbcms.com/module/sms/',
 	//模块作者
 	'author' => 'ZtbCMS',
 	//作者地址
