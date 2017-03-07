@@ -6,21 +6,9 @@
 // | Author: Jayin Ton <tonjayin@gmail.com>
 // +----------------------------------------------------------------------
 
-namespace Sms\Controller;
+namespace Sms\Service;
 
-use Common\Controller\Base;
-
-class ApiController extends Base {
-
-    protected $operator;
-    protected $conf;
-
-    protected function _initialize() {
-        parent::_initialize();
-
-        //获取默认短信平台，如果没有传入短信平台，则使用次短信平台发送
-        $this->operator = M('smsOperator')->where("enable='1'")->find()['tablename'];
-    }
+class SmsService {
 
     /**
      * 发送短信
@@ -37,14 +25,24 @@ class ApiController extends Base {
      *               sendtime => 发送时间
      *               result => 发送结果
      */
-    public function sendSms($template, $to, $param = NULL, $operator = NULL) {
+    public static function sendSms($template, $to, $param = NULL, $operator = NULL) {
+	
+	
+        //如果没有传入短信平台，则使用 default 短信平台发送
+	if (null == $operator){
+	    $operator = M('smsOperator')->where("enable='1'")->find()['tablename'];
+	}
 
-        $operator = NULL == $operator ? $this->operator : $operator;
-
+	// if param is not a json string, make it to json
         if (is_array($param)) {
+	    // make sure every param is a instance of string
+	    foreach($param as $k => $v){
+		$param[$k] = $v . "";
+	    }
             $param = json_encode($param);
         }
-
+	
+	//get sms operator configure
         $model = M('sms_' . $operator);
         $conf = $model->find($template);
 
