@@ -2,7 +2,7 @@
 
 namespace Sms\Lib\Ucpaas;
 
-class helper{
+class Helper{
 
     protected $conf;
 

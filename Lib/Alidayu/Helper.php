@@ -2,7 +2,7 @@
 
 namespace Sms\Lib\Alidayu;
 
-class helper{
+class Helper{
     
     public function send($conf,$to, $param){
         $c = new TopClient;
