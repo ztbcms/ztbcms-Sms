@@ -74,7 +74,7 @@ class SmsService {
 
         }
         else {
-            $this->error("所选短信平台暂不支持");
+            return json_decode(['code' => -1,'sub_msg'=>'不支持的短信平台'],true);
         }
 
 
