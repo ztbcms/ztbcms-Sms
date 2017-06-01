@@ -27,6 +27,12 @@ return array(
                 "type" => 1,
                 "status" => 1,
                 "name" => "平台设置",
+            ),
+            array(
+                "route" => "Sms/Index/log",
+                "type" => 1,
+                "status" => 1,
+                "name" => "发送日志",
             )
         ),
     ),
