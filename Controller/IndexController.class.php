@@ -90,9 +90,9 @@ class IndexController extends AdminBase {
 
         $result = array(
             'status' => TRUE,
-            'datas'  => array(
+            'datas' => array(
                 'operator' => $this->operatorModel->where("tablename='%s'", I('get.operator'))->find(),
-                'fields'   => $fields,
+                'fields' => $fields,
             ),
         );
 
@@ -115,17 +115,16 @@ class IndexController extends AdminBase {
         $Model = M($tablename);
         if (I('get.id')) {
             $modules = $Model->find(I('get.id'));
-        }
-        else {
+        } else {
             $modules = $Model->select();
         }
 
         $result = array(
             'status' => TRUE,
-            'datas'  => array(
+            'datas' => array(
                 'operator' => $this->operatorModel->where("tablename='%s'", I('get.operator'))->find(),
-                'fields'   => $fields,
-                'modules'  => $modules,
+                'fields' => $fields,
+                'modules' => $modules,
             ),
         );
 
@@ -167,14 +166,12 @@ class IndexController extends AdminBase {
                     $this->error("创建短信平台失败");
 
                 }
-            }
-            else {
+            } else {
                 $this->error($this->operatorModel->getError());
             }
 
 
-        }
-        else {
+        } else {
             $this->display();
         }
     }
@@ -261,7 +258,7 @@ class IndexController extends AdminBase {
 
         //去除多余的空格字符
         foreach ($_POST as $k => $v) {
-            $_POST[ $k ] = trim($v);
+            $_POST[$k] = trim($v);
         }
 
         try {
@@ -273,17 +270,16 @@ class IndexController extends AdminBase {
                 $this->ajaxReturn(array(
                     'status' => TRUE,
                 ));
-            }
-            else {
+            } else {
                 $this->ajaxReturn(array(
                     'status' => FALSE,
-                    'error'  => $table->getError(),
+                    'error' => $table->getError(),
                 ));
             }
         } catch (\Exception $e) {
             $this->ajaxReturn(array(
                 'status' => FALSE,
-                'error'  => $e->getMessage(),
+                'error' => $e->getMessage(),
             ));
         }
     }
@@ -302,17 +298,16 @@ class IndexController extends AdminBase {
                 $this->ajaxReturn(array(
                     'status' => TRUE,
                 ));
-            }
-            else {
+            } else {
                 $this->ajaxReturn(array(
                     'status' => FALSE,
-                    'error'  => $table->getError(),
+                    'error' => $table->getError(),
                 ));
             }
         } catch (\Exception $e) {
             $this->ajaxReturn(array(
                 'status' => FALSE,
-                'error'  => $e->getMessage(),
+                'error' => $e->getMessage(),
             ));
         }
     }
@@ -326,38 +321,60 @@ class IndexController extends AdminBase {
 
             //去除多余的空格字符
             foreach ($_POST as $k => $v) {
-                $_POST[ $k ] = trim($v);
+                $_POST[$k] = trim($v);
             }
 
             $tableName = "sms_" . I('post.operator', NULL);
             unset($_POST['operator']);
 
-            try{
+            try {
                 $Model = M($tableName);
 
                 if (FALSE !== $Model->save($_POST)) {
                     $this->ajaxReturn(array(
                         'status' => TRUE,
                     ));
-                }
-                else {
+                } else {
                     $this->ajaxReturn(array(
                         'status' => FALSE,
-                        'error'  => $Model->getError(),
+                        'error' => $Model->getError(),
                     ));
                 }
-            }catch (\Exception $e){
+            } catch (\Exception $e) {
 
                 $this->ajaxReturn(array(
                     'status' => FALSE,
-                    'error'  => $e->getMessage(),
+                    'error' => $e->getMessage(),
                 ));
             }
 
-        }
-        else if (IS_GET) {
+        } else if (IS_GET) {
             $this->display();
         }
     }
 
+    /**
+     * 发送日志
+     */
+    function log() {
+        $this->display();
+    }
+
+    /**
+     * 获取日志
+     */
+    public function get_log() {
+
+        $where = [];
+        if (I('get.start') || I('get.end')) {
+            $start = I('get.start', null, 'timeFormat');
+            $end = I('get.start', time(), 'timeFormat');
+            $where['inputtime'] = array('BETWEEN', [$start, $end]);
+        }
+
+        $res = M('smsLog')->where($where)->order('id desc')->select();
+        $res = empty($res) ? [] : $res;
+
+        $this->ajaxReturn(self::createReturn(true, $res,'网络繁忙。。'));
+    }
 }
