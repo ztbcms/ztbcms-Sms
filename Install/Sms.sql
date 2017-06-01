@@ -3,9 +3,9 @@ DROP TABLE IF EXISTS `cms_sms_log`;
 CREATE TABLE `cms_sms_log` (
   `id` INT(11) NOT NULL COMMENT 'ID' AUTO_INCREMENT,
   `operator` VARCHAR(80) NOT NULL COMMENT '运营商',
-  `template` VARCHAR(80) NOT NULL COMMENT '短信模板ID',
+  `template` TEXT NOT NULL COMMENT '短信模板ID',
   `recv` TEXT NOT NULL COMMENT '接收人',
-  `param` VARCHAR(255) DEFAULT '' COMMENT '短信模板变量',
+  `param` TEXT DEFAULT '' COMMENT '短信模板变量',
   `sendtime` VARCHAR(80) COMMENT '发送时间',
   `result` TEXT COMMENT '发送结果',
   PRIMARY KEY (`id`)
@@ -17,7 +17,7 @@ CREATE TABLE `cms_sms_operator` (
   `id` INT(11) NOT NULL COMMENT 'ID' AUTO_INCREMENT,
   `name` VARCHAR(80) NOT NULL COMMENT '运营商名称',
   `tablename` VARCHAR(80) NOT NULL COMMENT '表名',
-  `remark` TEXT COMMENT '描述',
+  `remark` VARCHAR(255) COMMENT '描述',
   `enable` TINYINT(4) DEFAULT 0 COMMENT '是否启用',
   PRIMARY KEY (`id`)
 )ENGINE = InnoDB DEFAULT CHARSET = utf8;
@@ -31,8 +31,8 @@ CREATE TABLE `cms_sms_alidayu` (
   `id` INT(11) NOT NULL COMMENT 'ID' AUTO_INCREMENT,
   `type` VARCHAR(80) DEFAULT 'normal' COMMENT '短信类型',
   `extend` VARCHAR(80) DEFAULT '' COMMENT '下级会员ID',
-  `sign` VARCHAR(80) COMMENT '短信签名',
-  `template` VARCHAR(80) COMMENT '短信模板ID',
+  `sign` VARCHAR(255) COMMENT '短信签名',
+  `template` VARCHAR(255) COMMENT '短信模板ID',
   `appkey` VARCHAR(255) COMMENT '应用key',
   `secret` VARCHAR(255) COMMENT '应用secret',
   PRIMARY KEY (`id`)
@@ -42,9 +42,9 @@ DROP TABLE IF EXISTS `cms_sms_ucpaas`;
 
 CREATE TABLE `cms_sms_ucpaas` (
   `id` INT(11) NOT NULL COMMENT 'ID' AUTO_INCREMENT,
-  `accountsid` VARCHAR(80) DEFAULT 'normal' COMMENT '开发者账号ID。由32个英文字母和阿拉伯数字组成的开发者账号唯一标识符。',
-  `token` VARCHAR(80) DEFAULT '' COMMENT '开发者账号TOKEN',
-  `appid` VARCHAR(80) COMMENT '应用ID',
-  `templateid` VARCHAR(80) COMMENT '短信模板ID',
+  `accountsid` VARCHAR(255) DEFAULT 'normal' COMMENT '开发者账号ID。由32个英文字母和阿拉伯数字组成的开发者账号唯一标识符。',
+  `token` VARCHAR(255) DEFAULT '' COMMENT '开发者账号TOKEN',
+  `appid` VARCHAR(255) COMMENT '应用ID',
+  `templateid` VARCHAR(255) COMMENT '短信模板ID',
   PRIMARY KEY (`id`)
 ) ENGINE = INNODB DEFAULT CHARSET = utf8;
