@@ -39,15 +39,21 @@
                         <h4 class="modal-title" id="myModalLabel">json</h4>
                     </div>
                     <div class="modal-body">
-                        <div v-for="(item,key) in param" :key="key">
-                            <code>{{ key }} : </code>
+                        <code>{</code><br>
+                        </tba><div v-for="(item,key) in param" :key="key">
+                            &nbsp;&nbsp;<code>"{{ key }}" : </code>
                             <template v-if="'object' !== typeof(param[key])">
-                                <code>{{ param[key] }}</code>
+                                <code>"{{ param[key] }}",</code>
                             </template>
-                            <template v-else v-for="(i,k) in param[key]" :k="k">
-                                <br>&nbsp;&nbsp;&nbsp;&nbsp;<code>{{ k }} : {{ param[key][k] }}</code>
+                            <template v-else >
+                                <br>&emsp;&nbsp;&nbsp;&nbsp;<code>{</code>
+                                <template v-for="(i,k) in param[key]" :k="k">
+                                    <br>&emsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>"{{ k }}" : "{{ param[key][k] }}",</code>
+                                </template>
+                                <br>&emsp;&nbsp;&nbsp;&nbsp;<code>}</code>
                             </template>
                         </div>
+                        <code>}</code><br>
                     </div>
                 </div>
             </div>
