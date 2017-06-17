@@ -2,20 +2,22 @@
 
 namespace Sms\Lib\Alidayu;
 
-class Helper{
-    
-    public function send($conf,$to, $param){
+use Sms\Lib\BaseHelper;
+
+class Helper extends BaseHelper {
+
+    public function send($conf, $to, $param) {
         $c = new TopClient;
         $c->appkey = $conf['appkey'];
         $c->secretKey = $conf['secret'];
         $req = new AlibabaAliqinFcSmsNumSendRequest;
-        
-        if (!empty($conf['extend'])){
+
+        if (!empty($conf['extend'])) {
             $req->setExtend($conf['extend']);
         }
         $req->setSmsType($conf['type']);
         $req->setSmsFreeSignName($conf['sign']);
-        if(!empty($param)){
+        if (!empty($param)) {
             $req->setSmsParam($param);
         }
         $req->setRecNum($to);
