@@ -6,7 +6,23 @@ use Sms\Lib\BaseHelper;
 
 class Helper extends BaseHelper {
 
+    /**
+     *
+     * @param array $conf
+     * @param string $to
+     * @param array $param
+     * @return mixed|string
+     */
     public function send($conf, $to, $param) {
+
+        // 如果传入数据不是 json 字符串，将其转化为 json 字符串
+        if (is_array($param)) {
+            // 保证所有的参数都是字符串类型
+            foreach($param as $k => $v){
+                $param[$k] = $v . "";
+            }
+            $param = json_encode($param);
+        }
 
         $ucpass = new Ucpaas($conf);
 
