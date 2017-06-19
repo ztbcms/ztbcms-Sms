@@ -5,7 +5,7 @@ CREATE TABLE `cms_sms_log` (
   `operator` VARCHAR(80) NOT NULL COMMENT '运营商',
   `template` TEXT NOT NULL COMMENT '短信模板ID',
   `recv` TEXT NOT NULL COMMENT '接收人',
-  `param` TEXT DEFAULT '' COMMENT '短信模板变量',
+  `param` TEXT COMMENT '短信模板变量',
   `sendtime` VARCHAR(80) COMMENT '发送时间',
   `result` TEXT COMMENT '发送结果',
   PRIMARY KEY (`id`)
