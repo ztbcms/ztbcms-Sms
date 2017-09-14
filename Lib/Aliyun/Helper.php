@@ -6,7 +6,11 @@
 
 namespace Sms\Lib\Aliyun;
 
+//引入阿里云短信服务SDK
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
+
 use Aliyun\Api\Sms\Request\V20170525\SendSmsRequest;
+use Aliyun\Core\Config;
 use Aliyun\Core\DefaultAcsClient;
 use Aliyun\Core\Profile\DefaultProfile;
 use Sms\Lib\BaseHelper;
@@ -22,8 +26,8 @@ class Helper extends BaseHelper {
      * @return mixed
      */
     function send($conf, $to, $param) {
-        require_once(dirname(__FILE__) . '/vendor/autoload.php');
-
+        // 加载区域结点配置
+        Config::load();
 
         // 短信API产品名
         $product = "Dysmsapi";
