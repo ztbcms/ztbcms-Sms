@@ -24,7 +24,8 @@ CREATE TABLE `cms_sms_operator` (
 
 INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('1', '阿里大于', 'alidayu', '阿里大于短信平台', '1');
 INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('2', '云之讯', 'ucpaas', '云之讯短信平台', '0');
-INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('3', '阿里短信', 'alisms', '阿里短信服务', '0');
+INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('3', '阿里短信', 'alisms', '阿里消息服务之短信服务', '0');
+INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('4', '阿里云短信服务', 'aliyun', '阿里云短信服务', '0');
 
 
 DROP TABLE IF EXISTS `cms_sms_alidayu`;
@@ -62,5 +63,16 @@ CREATE TABLE `cms_sms_alisms` (
   `sign` varchar(255) DEFAULT '' COMMENT '短信签名',
   `template` varchar(255) DEFAULT '' COMMENT '短信模版 Code',
   `message_body` varchar(255) DEFAULT '' COMMENT 'SMS消息体（阿里没有说明作用，不为空即可）',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cms_sms_aliyun`;
+
+CREATE TABLE `cms_sms_aliyun` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `access_id` varchar(255) DEFAULT '' COMMENT 'Access Key ID（阿里云API密钥）',
+  `access_key` varchar(255) DEFAULT '' COMMENT 'Access Key Secret（阿里云API密钥）',
+  `sign` varchar(255) DEFAULT '' COMMENT '短信签名',
+  `template` varchar(255) DEFAULT '' COMMENT '短信模版 Code',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
