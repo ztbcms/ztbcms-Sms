@@ -23,7 +23,6 @@
 
 </div>
 
-<script src="//cdn.bootcss.com/vue/2.1.5/vue.min.js"></script>
 <script>
     $.get("{:U('Sms/Index/get_modules',array('operator'=>$_GET['operator'],'id' => $_GET['id']))}", null, function (data) {
         if (data.status){

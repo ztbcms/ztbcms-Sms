@@ -10,6 +10,7 @@ namespace Sms\Controller;
 
 
 use Common\Controller\AdminBase;
+use Sms\Service\SmsService;
 
 class IndexController extends AdminBase {
 
@@ -376,5 +377,25 @@ class IndexController extends AdminBase {
         $res = empty($res) ? [] : $res;
 
         $this->ajaxReturn(self::createReturn(true, $res,'网络繁忙。。'));
+    }
+
+    /**
+     * 测试发送短信模板页
+     */
+    function testSend(){
+        $this->display();
+    }
+
+    /**
+     * 发送测试短信操作
+     */
+    function doTestSend(){
+        $template_id = I('post.template_id');
+        $to = I('post.phone');
+        $operator = I('post.operator');
+        $param = I('post.param');
+
+        SmsService::sendSms($template_id, $to, $param, $operator);
+        $this->ajaxReturn(self::createReturn(true, null, '发送操作完成'));
     }
 }
