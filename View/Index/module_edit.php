@@ -37,6 +37,9 @@
                         $.post(url,data,function(data){
                             if (data.status){
                                 alert('模板更新成功！');
+                                setTimeout(function(){
+                                    window.location.href = "{:U('Sms/Index/modules', ['operator' => I('get.operator')])}";
+                                }, 600)
                             }else{
                                 alert(data.error);
                                 window.location.reload();
