@@ -121,7 +121,7 @@ class IndexController extends AdminBase {
 
         $result = array(
             'status' => TRUE,
-            'datas' => array(
+            'data' => array(
                 'operator' => $this->operatorModel->where("tablename='%s'", I('get.operator'))->find(),
                 'fields' => $fields,
                 'modules' => $modules,

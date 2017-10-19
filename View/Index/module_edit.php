@@ -10,7 +10,7 @@
             <table width="100%" class="table_form contentWrap">
                 <tr v-for="field in fields">
                     <th><strong>{{ field.field }}</strong><br/>{{ field.comment }}</th>
-                    <td><input :name="field.field" :value="modules[field.field]" type="text"></td>
+                    <td><input :name="field.field" :value="modules[field.field]" type="text" class="input" style="width: 400px;"></td>
                 </tr>
             </table>
             <div style="margin-top:1rem;">
@@ -25,11 +25,11 @@
 
 <script src="//cdn.bootcss.com/vue/2.1.5/vue.min.js"></script>
 <script>
-    $.get("{:U('Sms/Index/get_modules',array('operator'=>$_GET['operator'],'id' => $_GET['id']))}&XDEBUG_SESSION_START=13788", null, function (data) {
+    $.get("{:U('Sms/Index/get_modules',array('operator'=>$_GET['operator'],'id' => $_GET['id']))}", null, function (data) {
         if (data.status){
             new Vue({
                 el:"#body",
-                data:data.datas,
+                data:data.data,
                 methods:{
                     edit: function(e){
                         var data = $('#form').serialize();
