@@ -21,12 +21,12 @@
         <td>{{ operator.remark }}</td>
         <td v-if="1 == operator.enable">默认平台</td>
         <td v-else>
-            <a v-if="0 == operator.enable" @click="choose" :data-operator="operator.tablename" href="javascript:">设为默认</a>
+            <a v-if="0 == operator.enable" @click="choose(operator.tablename)" href="javascript:">设为默认</a>
         </td>
         <td>
-            <a @click="model" :data-operator="operator.tablename" href="javascript:">模型管理</a> |
-            <a @click="conf" :data-operator="operator.tablename" href="javascript:">短信模版管理</a> |
-            <a @click="del" :data-operator="operator.tablename" href="javascript:">删除平台</a>
+            <a @click="model(operator.tablename)" href="javascript:">模型管理</a> |
+            <a @click="conf(operator.tablename)" href="javascript:">短信模版管理</a> |
+            <a @click="del(operator.tablename)" href="javascript:">删除平台</a>
         </td>
     </tr>
 	</tbody>
@@ -44,25 +44,25 @@
                 el:"#operators",
                 data:data.datas,
                 methods:{
-                    choose:function(e){
-                        window.location.href = "{:U('Index/choose')}&operator=" + $(e.toElement).data('operator');
+                    choose:function(operator){
+                        window.location.href = "{:U('Index/choose')}&operator=" + operator;
                     },
 
-                    model:function(e){
-                        window.location.href = "{:U('Index/model')}&operator=" + $(e.toElement).data('operator');
+                    model:function(operator){
+                        window.location.href = "{:U('Index/model')}&operator=" + operator;
                     },
 
-                    conf:function(e){
-                        window.location.href = "{:U('Index/modules')}&operator=" + $(e.toElement).data('operator');
+                    conf:function(operator){
+                        window.location.href = "{:U('Index/modules')}&operator=" + operator;
                     },
 
                     //删除平台操作
-                    del:function(e){
+                    del:function(operator){
                         var r = confirm("确定删除此平台吗？");
                         if(r){
                             var url = "{:U('Index/operator_del')}";
                             var data = {
-                                operator: $(e.toElement).data('operator')
+                                operator: operator
                             }
                             $.post(url,data,function(data){
                                 if (data.status){
