@@ -58,6 +58,18 @@
                 </div>
             </div>
         </div>
+        <!-- 分页 -->
+        <div style="text-align: center">
+            <ul class="pagination pagination-sm no-margin">
+                <button @click="toPage( parseInt(where.page) - 1 )" class="btn btn-primary">上一页</button>
+                {{ where.page }} / {{ total_page }}
+                <button @click="toPage( parseInt(where.page) + 1 )" class="btn btn-primary">下一页</button>
+                <span style="line-height: 30px;margin-left: 10px;"><input id="ipt_page"
+                                                                          style="width:50px;text-align: center;"
+                                                                          type="text" v-model="temp_page"></span>
+                <span><button class="btn btn-primary" @click="toPage( temp_page )">跳转</button></span>
+            </ul>
+        </div>
     </div>
 </div>
 
@@ -68,8 +80,14 @@
     new Vue({
         el: "#app",
         data: {
+            where: {
+                page: 1,
+                limit: 20,
+            },
             logs: [],
-            param: []
+            param: [],
+            temp_page: 1,
+            total_page: 0,
         },
         filters: {
             dataFormat: function (time) {
@@ -80,13 +98,26 @@
         methods: {
             getData: function () {
                 var vm = this;
-                $.get("{:U('Sms/Index/get_log')}", null, function (data) {
+                $.get("{:U('Sms/Index/get_log')}", vm.where, function (data) {
                     if (data.status) {
-                        vm.logs = data.data;
+                        vm.logs = data.data.items;
+                        vm.page = data.data.page;
+                        vm.total_page = data.data.total_page;
+                        vm.limit = data.data.limit;
                     } else {
                         alert('网络繁忙');
                     }
                 }, 'json');
+            },
+            toPage: function(page){
+                this.where.page = page;
+                if (this.where.page < 1){
+                    this.where.page = 1;
+                }
+                if (this.where.page > this.total_page){
+                    this.where.page = this.total_page;
+                }
+                this.getData();
             },
             showJson: function (param) {
                 this.param = JSON.parse(param);

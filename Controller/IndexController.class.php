@@ -365,7 +365,8 @@ class IndexController extends AdminBase {
      * 获取日志
      */
     public function get_log() {
-
+        $page = I('page', 1);
+        $limit = I('limit', 20);
         $where = [];
         if (I('get.start') || I('get.end')) {
             $start = I('get.start', null, 'timeFormat');
@@ -373,10 +374,18 @@ class IndexController extends AdminBase {
             $where['inputtime'] = array('BETWEEN', [$start, $end]);
         }
 
-        $res = M('smsLog')->where($where)->order('id desc')->select();
-        $res = empty($res) ? [] : $res;
+        $count = M('smsLog')->where($where)->count();
+        $total_page = ceil($count / $limit);
+        $Logs = M('smsLog')->where($where)->page($page)->limit($limit)->order('id desc')->select();
 
-        $this->ajaxReturn(self::createReturn(true, $res,'网络繁忙。。'));
+        $data = [
+            'items' => $Logs,
+            'page' => $page,
+            'limit' => $limit,
+            'total_page' => $total_page,
+        ];
+        $this->ajaxReturn(self::createReturn(true, $data, '网络繁忙。。'));
+
     }
 
     /**
