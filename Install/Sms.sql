@@ -8,6 +8,9 @@ CREATE TABLE `cms_sms_log` (
   `param` TEXT COMMENT '短信模板变量',
   `sendtime` VARCHAR(80) COMMENT '发送时间',
   `result` TEXT COMMENT '发送结果',
+  `send_status` TINYINT(4) DEFAULT 0 COMMENT '是否发送成功',
+  `is_used` TINYINT(4) DEFAULT 0 COMMENT '是否已使用',
+  `action` VARCHAR(80) NOT NULL COMMENT 'action',
   PRIMARY KEY (`id`)
 )ENGINE = InnoDB DEFAULT CHARSET = utf8;
 

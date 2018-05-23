@@ -404,7 +404,7 @@ class IndexController extends AdminBase {
         $operator = I('post.operator');
         $param = I('post.param');
 
-        SmsService::sendSms($template_id, $to, $param, $operator);
+        SmsService::sendSms($template_id, $to, $param, 'test', $operator);
         $this->ajaxReturn(self::createReturn(true, null, '发送操作完成'));
     }
 }
