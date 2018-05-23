@@ -1,6 +1,5 @@
-<?php if (!defined('CMS_VERSION'))
-    exit(); ?>
 <Admintemplate file="Common/Head"/>
+
 <body class="J_scroll_fixed">
 <div class="wrap J_check_wrap hidden" id="body">
     <Admintemplate file="Common/Nav"/>
@@ -24,6 +23,7 @@
                     {{ module[field.field] }}
                 </td>
                 <td>
+                    <a @click="testSend(operator.tablename, module.id)" href="javascript:">发送测试</a> |
                     <a @click="edit" :data-operator="operator.tablename" :data-id="module.id" href="javascript:">修改</a> |
                     <a @click="del" :data-operator="operator.tablename" :data-id="module.id" href="javascript:">删除</a>
                 </td>
@@ -49,13 +49,12 @@
 
 </div>
 
-<script src="//cdn.bootcss.com/vue/2.1.5/vue.min.js"></script>
 <script>
     $.get("{:U('Sms/Index/get_modules',array('operator'=>$_GET['operator']))}", null, function (data) {
         if (data.status){
             new Vue({
                 el:"#body",
-                data:data.datas,
+                data:data.data,
                 methods:{
                     add: function (e) {
                         var data = $('#form').serialize();
@@ -85,6 +84,20 @@
                                 alert(data.error);
                             }
                         },'json');
+                    },
+                    testSend: function(operator, template_id){
+                        layer.open({
+                            type: 2,
+                            title: '操作',
+//                            closeBtn: 0, //不显示关闭按钮
+                            shade: [0],
+                            area: ['40%', '50%'],
+                            anim: 2,
+                            content: "{:U('Sms/Index/testSend')}&operator="+operator+'&template_id='+template_id, //iframe的url，no代表不显示滚动条
+                            end: function(){
+
+                            }
+                        });
                     }
                 },
                 mounted: function(){
