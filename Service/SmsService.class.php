@@ -8,7 +8,9 @@
 
 namespace Sms\Service;
 
-class SmsService {
+use System\Service\BaseService;
+
+class SmsService extends BaseService{
 
     /**
      * 发送短信
@@ -16,16 +18,11 @@ class SmsService {
      * @param string $template 短信模板ID，从后台配置获取
      * @param string $to 短信接收人，多个接收人号码之间使用英文半角逗号隔开
      * @param array $param 短信模板变量，数组或者json字符串
+     * @param string $action 例如:register,login
      * @param array $operator 短信平台，不传入时，使用后台配置的默认短信平台
-     *
-     * @return array operator => 发送平台，
-     *               template => 短信模板数据，
-     *               recv => 短信接收人
-     *               param => 短信模版参数
-     *               sendtime => 发送时间
-     *               result => 发送结果
+     * @return array
      */
-    public static function sendSms($template, $to, $param = NULL, $operator = NULL) {
+    public static function sendSms($template, $to, $param = NULL, $action = 'none', $operator = NULL) {
 
 
         //如果没有传入短信平台，则使用后台配置的开启的短信平台发送
@@ -62,18 +59,60 @@ class SmsService {
                 'param' => is_array($param) ? json_encode($param) : $param,
                 'sendtime' => time(),
                 'result' => $result,
+                'send_status' => 0,
+                'is_used' => 0,
+                'action' => $action,
             );
 
             if (M('sms_log')->create($log)) {
-                M('sms_log')->add($log);
+                $sms_log_id = M('sms_log')->add($log);
             }
 
-            return json_decode($result, true);
+            $data = json_decode($result, true);
+            if($data['Code'] == 'OK'){
+                if($sms_log_id){
+                    //发送状态 => 成功
+                    M('sms_log')->where(['id' => $sms_log_id])->save(['send_status' => 1]);
+                }
+                return self::createReturn(true, [], '发送成功');
+            }else{
+                $error = $data['Message'];
+                return self::createReturn(false, null, '发送失败');
+            }
 
         } else {
-            return json_decode(['code' => -1, 'sub_msg' => '不支持的短信平台'], true);
+            return self::createReturn(false, null, '不支持的短信平台');
         }
+    }
 
+    /**
+     * 验证
+     *
+     * @param $phone string 手机号
+     * @param $code string 验证码
+     * @param $action string 例如:register,login
+     * @return bool
+     */
+    static function checkSmsCode($phone, $code, $action = 'none'){
+        $code = (int)$code;
 
+        $count = M('SmsLog')->where([
+            'recv' => $phone,
+            'action' => $action,
+            'is_used' => 0, //未使用
+            'send_status' => 1, //发送成功
+            'param' => ['LIKE','%"'.$code.'"%'],
+        ])->count();
+        if($count){
+            M('SmsLog')->where([
+                'recv' => $phone,
+                'action' => $action,
+                'send_status' => 1,
+                'param' => ['LIKE','%"'.$code.'"%']
+            ])->save(['is_used' => 1]);
+            return true;
+        }else{
+            return false;
+        }
     }
 }
