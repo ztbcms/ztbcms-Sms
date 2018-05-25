@@ -10,19 +10,24 @@ namespace Sms\Service;
 
 use System\Service\BaseService;
 
-class SmsService extends BaseService{
+class SmsService extends BaseService {
+
+    const SEND_STATUS_YES = 1;//发送成功
+    const SEND_STATUS_NO = 0;//发送失败
+    const USED_STATUS_YES = 1; //已使用
+    const USED_STATUS_NO = 0; //为使用
 
     /**
      * 发送短信
      *
      * @param string $template 短信模板ID，从后台配置获取
-     * @param string $to 短信接收人，多个接收人号码之间使用英文半角逗号隔开
-     * @param array $param 短信模板变量，数组或者json字符串
-     * @param string $action 例如:register,login
-     * @param array $operator 短信平台，不传入时，使用后台配置的默认短信平台
+     * @param string $to       短信接收人，多个接收人号码之间使用英文半角逗号隔开
+     * @param array  $param    短信模板变量，数组或者json字符串
+     * @param string $action   例如:register,login
+     * @param array  $operator 短信平台，不传入时，使用后台配置的默认短信平台
      * @return array
      */
-    public static function sendSms($template, $to, $param = NULL, $action = 'none', $operator = NULL) {
+    public static function sendSms($template, $to, $param = null, $action = 'none', $operator = null) {
 
 
         //如果没有传入短信平台，则使用后台配置的开启的短信平台发送
@@ -59,8 +64,8 @@ class SmsService extends BaseService{
                 'param' => is_array($param) ? json_encode($param) : $param,
                 'sendtime' => time(),
                 'result' => $result,
-                'send_status' => 0,
-                'is_used' => 0,
+                'send_status' => self::SEND_STATUS_NO,
+                'is_used' => self::SEND_STATUS_NO,
                 'action' => $action,
             );
 
@@ -69,14 +74,16 @@ class SmsService extends BaseService{
             }
 
             $data = json_decode($result, true);
-            if($data['Code'] == 'OK'){
-                if($sms_log_id){
+            if ($data['Code'] == 'OK') {
+                if ($sms_log_id) {
                     //发送状态 => 成功
-                    M('sms_log')->where(['id' => $sms_log_id])->save(['send_status' => 1]);
+                    M('sms_log')->where(['id' => $sms_log_id])->save(['send_status' => self::SEND_STATUS_YES]);
                 }
+
                 return self::createReturn(true, [], '发送成功');
-            }else{
+            } else {
                 $error = $data['Message'];
+
                 return self::createReturn(false, null, '发送失败');
             }
 
@@ -88,30 +95,31 @@ class SmsService extends BaseService{
     /**
      * 验证
      *
-     * @param $phone string 手机号
-     * @param $code string 验证码
+     * @param $phone  string 手机号
+     * @param $code   string 验证码
      * @param $action string 例如:register,login
      * @return bool
      */
-    static function checkSmsCode($phone, $code, $action = 'none'){
+    static function checkSmsCode($phone, $code, $action = 'none') {
         $code = (int)$code;
 
         $count = M('SmsLog')->where([
             'recv' => $phone,
             'action' => $action,
-            'is_used' => 0, //未使用
-            'send_status' => 1, //发送成功
-            'param' => ['LIKE','%"'.$code.'"%'],
+            'is_used' => self::USED_STATUS_NO, //未使用
+            'send_status' => self::SEND_STATUS_YES, //发送成功
+            'param' => ['LIKE', '%"' . $code . '"%'],
         ])->count();
-        if($count){
+        if ($count) {
             M('SmsLog')->where([
                 'recv' => $phone,
                 'action' => $action,
-                'send_status' => 1,
-                'param' => ['LIKE','%"'.$code.'"%']
-            ])->save(['is_used' => 1]);
+                'send_status' => self::SEND_STATUS_YES,
+                'param' => ['LIKE', '%"' . $code . '"%']
+            ])->save(['is_used' => self::USED_STATUS_YES]);
+
             return true;
-        }else{
+        } else {
             return false;
         }
     }
