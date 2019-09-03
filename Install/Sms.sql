@@ -8,9 +8,6 @@ CREATE TABLE `cms_sms_log` (
   `param` TEXT COMMENT '短信模板变量',
   `sendtime` VARCHAR(80) COMMENT '发送时间',
   `result` TEXT COMMENT '发送结果',
-  `send_status` TINYINT(4) DEFAULT 0 COMMENT '是否发送成功',
-  `is_used` TINYINT(4) DEFAULT 0 COMMENT '是否已使用',
-  `action` VARCHAR(80) NOT NULL COMMENT 'action',
   PRIMARY KEY (`id`)
 )ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
@@ -79,7 +76,34 @@ CREATE TABLE `cms_sms_aliyun` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `cms_sms_alibabacloud_mainland`;
+-- 國際版阿里雲短信服務（大陸短信）
+CREATE TABLE `cms_sms_alibabacloud_mainland`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `access_key_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '通过阿里云申请可得',
+  `access_key_secret` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '通过阿里云申请',
+  `is_open` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '1' COMMENT '是否开启',
+  `sms_from` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '短信签名',
+  `sms_template_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '短信CODE',
+  `about` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '介绍',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+
+DROP TABLE IF EXISTS `cms_sms_alibabacloud_abroad`;
+-- 國際版阿里雲短信服務（國際短信）
+CREATE TABLE `cms_sms_alibabacloud_abroad`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `access_key_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '通过阿里云申请可得',
+  `access_key_secret` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '通过阿里云申请',
+  `is_open` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '1' COMMENT '是否开启',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+
 INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('1', '阿里大于', 'alidayu', '阿里大于短信平台', '0');
 INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('2', '云之讯', 'ucpaas', '云之讯短信平台', '0');
 INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('3', '阿里短信', 'alisms', '阿里消息服务之短信服务', '0');
 INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('4', '阿里云短信服务', 'aliyun', '阿里云短信服务', '1');
+INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('5', '國際版阿里雲短信服務（大陸短信）', 'alibabacloud_mainland', '國際版阿里雲短信服務（大陸短信）', '0');
+INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('6', '國際版阿里雲短信服務（國際短信）', 'alibabacloud_abroad', '國際版阿里雲短信服務（國際短信）', '0');

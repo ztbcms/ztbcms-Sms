@@ -403,8 +403,15 @@ class IndexController extends AdminBase {
         $to = I('post.phone');
         $operator = I('post.operator');
         $param = I('post.param');
-
-        SmsService::sendSms($template_id, $to, $param, 'test', $operator);
+        if($operator == 'alibabacloud_abroad'){
+            //发送阿里云国际版（国籍短信）
+            SmsService::sendAlibabacloudAbroad($template_id,$to,$param);
+        } else if($operator == 'alibabacloud_mainland'){
+            //发送阿里云国际版（大陆短信）
+            SmsService::sendAlibabacloudMainland($template_id, $to, $param);
+        } else {
+            SmsService::sendSms($template_id, $to, $param, 'test', $operator);
+        }
         $this->ajaxReturn(self::createReturn(true, null, '发送操作完成'));
     }
 }
