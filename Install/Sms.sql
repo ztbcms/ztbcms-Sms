@@ -77,7 +77,7 @@ CREATE TABLE `cms_sms_aliyun` (
 
 
 DROP TABLE IF EXISTS `cms_sms_alibabacloud_mainland`;
--- 國際版阿里雲短信服務（大陸短信）
+-- 国际版阿里云短信服务（大陆短信）
 CREATE TABLE `cms_sms_alibabacloud_mainland`  (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `access_key_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '通过阿里云申请可得',
@@ -91,7 +91,7 @@ CREATE TABLE `cms_sms_alibabacloud_mainland`  (
 
 
 DROP TABLE IF EXISTS `cms_sms_alibabacloud_abroad`;
--- 國際版阿里雲短信服務（國際短信）
+-- 国际版阿里云短信服务（国际短信）
 CREATE TABLE `cms_sms_alibabacloud_abroad`  (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `access_key_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '通过阿里云申请可得',
@@ -105,5 +105,5 @@ INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) V
 INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('2', '云之讯', 'ucpaas', '云之讯短信平台', '0');
 INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('3', '阿里短信', 'alisms', '阿里消息服务之短信服务', '0');
 INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('4', '阿里云短信服务', 'aliyun', '阿里云短信服务', '1');
-INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('5', '國際版阿里雲短信服務（大陸短信）', 'alibabacloud_mainland', '國際版阿里雲短信服務（大陸短信）', '0');
-INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('6', '國際版阿里雲短信服務（國際短信）', 'alibabacloud_abroad', '國際版阿里雲短信服務（國際短信）', '0');
+INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('5', '国际版阿里云短信服务（大陆短信）', 'alibabacloud_mainland', '国际版阿里云短信服务（大陆短信）', '0');
+INSERT INTO `cms_sms_operator` (`id`, `name`, `tablename`, `remark`, `enable`) VALUES ('6', '国际版阿里云短信服务（国际短信）', 'alibabacloud_abroad', '国际版阿里云短信服务（国际短信）', '0');

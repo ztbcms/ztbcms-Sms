@@ -397,6 +397,7 @@ class IndexController extends AdminBase {
 
     /**
      * 发送测试短信操作
+     * @throws \AlibabaCloud\Client\Exception\ClientException
      */
     function doTestSend(){
         $template_id = I('post.template_id');
