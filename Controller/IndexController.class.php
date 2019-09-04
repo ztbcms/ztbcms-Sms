@@ -404,15 +404,11 @@ class IndexController extends AdminBase {
         $to = I('post.phone');
         $operator = I('post.operator');
         $param = I('post.param');
-        if($operator == 'alibabacloud_abroad'){
-            //发送阿里云国际版（国际短信）
-            SmsService::sendAlibabacloudAbroad($template_id,$to,$param);
-        } else if($operator == 'alibabacloud_mainland'){
-            //发送阿里云国际版（大陆短信）
-            SmsService::sendAlibabacloudMainland($template_id, $to, $param);
-        } else {
-            SmsService::sendSms($template_id, $to, $param, 'test', $operator);
-        }
-        $this->ajaxReturn(self::createReturn(true, null, '发送操作完成'));
+        $areaCode = I('post.areaCode','','trim');
+        $abroadMsg = I('abroadMsg','','trim');
+
+        if($operator == 'alibabacloud_abroad') $param = $abroadMsg;
+        $res = SmsService::sendSms($template_id, $to, $param, 'test', $operator,$areaCode);
+        $this->ajaxReturn($res);
     }
 }

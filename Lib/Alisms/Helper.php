@@ -17,7 +17,7 @@ class Helper extends BaseHelper {
 
     protected $client;
 
-    function send($conf, $to, $param) {
+    function send($conf, $to, $param,$areaCode) {
 
         require_once(dirname(__FILE__) . '/mns-autoloader.php');
 

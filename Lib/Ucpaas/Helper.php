@@ -13,7 +13,7 @@ class Helper extends BaseHelper {
      * @param array $param
      * @return mixed|string
      */
-    public function send($conf, $to, $param) {
+    public function send($conf, $to, $param,$areaCode) {
 
         // 如果传入数据不是 json 字符串，将其转化为 json 字符串
         if (is_array($param)) {
