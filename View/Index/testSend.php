@@ -110,11 +110,12 @@
                 },
                 doSendMessage: function(){
                     var that = this;
-                    if(that.phone.length !== 11 ){
-                        layer.msg('请正确填写手机号码');
-                        return;
+                    if(that.operator != 'alibabacloud_abroad' && that.operator != 'alibabacloud_mainland'){
+                        if(that.phone.length !== 11 ){
+                            layer.msg('请正确填写手机号码');
+                            return;
+                        }
                     }
-
                     var param_result = {};
                     this.params.forEach(function(param){
                         param_result[param.key] = param.value;

@@ -9,6 +9,9 @@
 namespace Sms\Service;
 
 use System\Service\BaseService;
+use AlibabaCloud\Client\AlibabaCloud;
+use AlibabaCloud\Client\Exception\ClientException;
+use AlibabaCloud\Client\Exception\ServerException;
 
 class SmsService extends BaseService {
 
@@ -121,6 +124,135 @@ class SmsService extends BaseService {
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * 发送阿里云国际版的国际消息
+     * @param $template_id 消息模板
+     * @param $phone 手机号码(注意此处手机号码需要带区号)
+     * @param $param 建议实际使用的时候更换为需要发送的消息
+     * @return mixed
+     * 短信消息发送是否成功可通过 https://sms-intl.console.aliyun.com 登录查看
+     */
+    public static function sendAlibabacloudAbroad($template_id,$phone,$param){
+        if(!$template_id) return self::createReturn(false, null, '模板id不能为空');
+        if(!$phone) return self::createReturn(false, null, '电话号码不能为空');
+
+        $message = '发送的参数为';
+        foreach ($param as $k => $v){
+            $message .= $k.':'.$v;
+        }
+
+        require dirname(__DIR__) . '/Lib/AlibabaCloud/client/vendor/autoload.php';
+        $alibaba = M('sms_alibabacloud_abroad')->where(['id'=>$template_id])->find();
+        if ($alibaba['is_open'] != '1') {
+            return self::createReturn(false, null, '该短信服务未开启');
+        }
+        AlibabaCloud::accessKeyClient($alibaba['access_key_id'], $alibaba['access_key_secret'])
+            ->regionId('ap-southeast-1')
+            ->asGlobalClient();
+
+        $conf = M('sms_alibabacloud_abroad')->find($template_id);
+        $log = array(
+            'operator' => 'alibabacloud_mainland',
+            'template' => json_encode($conf),
+            'recv' => $phone,
+            'param' => is_array($param) ? json_encode($param) : $param,
+            'sendtime' => time(),
+            'is_used' => self::SEND_STATUS_NO,
+        );
+
+        try {
+            $result = AlibabaCloud::rpcRequest()
+                ->product('Dysmsapi')
+                ->host('dysmsapi.ap-southeast-1.aliyuncs.com')
+                ->version('2018-05-01')
+                ->action('SendMessageToGlobe')
+                ->method('POST')
+                ->options([
+                    'query' => [
+                        "To" => $phone,
+                        "Message" => $message,
+                    ],
+                ])->request();
+            $conf = M('sms_alibabacloud_abroad')->find($template_id);
+
+            //发送记录
+            $log['result'] = '发送成功';
+            M('sms_log')->add($log);
+            return self::createReturn(true, null, '请求成功');
+        } catch (ClientException $e) {
+            $log['result'] = $e->getErrorMessage() . PHP_EOL.'请求失败';
+            M('sms_log')->add($log);
+            return self::createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败');
+        } catch (ServerException $e) {
+            $log['result'] = $e->getErrorMessage() . PHP_EOL.'请求失败';
+            M('sms_log')->add($log);
+            return self::createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败');
+        }
+    }
+
+    /**
+     * 发送阿里云国际版的大陆消息
+     * @param $template_id 消息模板
+     * @param $to 手机号码(注意此处手机号码需要带区号)
+     * @param $param （对应的参数）
+     */
+    public static function sendAlibabacloudMainland($template_id, $phone, $param){
+        if(!$template_id) return self::createReturn(false, '', '模板id不能为空');
+        if(!$phone) return self::createReturn(false, '', '电话号码不能为空');
+
+        require dirname(__DIR__) . '/Lib/AlibabaCloud/client/vendor/autoload.php';
+        $alibaba = M('sms_alibabacloud_mainland')->where(['id'=>$template_id])->find();
+        if ($alibaba['is_open'] != '1') {
+            return self::createReturn(false, '', '该短信服务未开启');
+        }
+        if(!$alibaba['sms_from'] || !$alibaba['sms_template_code']){
+            return self::createReturn(false, '', '该短信服务未开启');
+        }
+        AlibabaCloud::accessKeyClient($alibaba['access_key_id'], $alibaba['access_key_secret'])
+            ->regionId('ap-southeast-1')
+            ->asGlobalClient();
+        $TemplateParam = json_encode($param,true);
+        $query = [
+            'To' => $phone,
+            'From' => $alibaba['sms_from'], //短信签名
+            'TemplateCode' => $alibaba['sms_template_code'], //短信内容
+            'TemplateParam' => $TemplateParam  //短信的内容
+        ];
+        $conf = M('sms_alibabacloud_mainland')->find($template_id);
+        $log = array(
+            'operator' => 'alibabacloud_mainland',
+            'template' => json_encode($conf),
+            'recv' => $phone,
+            'param' => is_array($param) ? json_encode($param) : $param,
+            'sendtime' => time(),
+            'is_used' => self::SEND_STATUS_NO,
+        );
+        try {
+            $result = AlibabaCloud::rpcRequest()
+                ->product('Dysmsapi')
+                ->host('dysmsapi.ap-southeast-1.aliyuncs.com')
+                ->version('2018-05-01')
+                ->action('SendMessageWithTemplate')
+                ->method('POST')
+                ->options([
+                    'query' => $query,
+                ])
+                ->request();
+            //发送记录
+            $log['result'] = '请求成功';
+            M('sms_log')->add($log);
+            return self::createReturn(true, null, '请求成功');
+        } catch (ClientException $e) {
+            $log['result'] = $e->getErrorMessage().PHP_EOL.'请求失败';
+            M('sms_log')->add($log);
+            return self::createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败');
+        } catch (ServerException $e) {
+            $log['result'] = $e->getErrorMessage().PHP_EOL.'请求失败';
+            M('sms_log')->add($log);
+            return self::createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败');
         }
     }
 }
