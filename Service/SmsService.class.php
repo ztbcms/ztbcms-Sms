@@ -128,12 +128,13 @@ class SmsService extends BaseService {
     }
 
     /**
-     * 发送阿里云国际版的国际消息
-     * @param $template_id 消息模板
-     * @param $phone 手机号码(注意此处手机号码需要带区号)
-     * @param $param 建议实际使用的时候更换为需要发送的消息
+     * 发送阿里云国际版的国际短信
+     * @param string $template_id 消息模板
+     * @param string $phone 手机号码(注意此处手机号码需要带区号)
+     * @param array $param 建议实际使用的时候更换为需要发送的消息
      * @return mixed
      * 短信消息发送是否成功可通过 https://sms-intl.console.aliyun.com 登录查看
+     * @throws ClientException
      */
     public static function sendAlibabacloudAbroad($template_id,$phone,$param){
         if(!$template_id) return self::createReturn(false, null, '模板id不能为空');
@@ -194,10 +195,12 @@ class SmsService extends BaseService {
     }
 
     /**
-     * 发送阿里云国际版的大陆消息
-     * @param $template_id 消息模板
-     * @param $to 手机号码(注意此处手机号码需要带区号)
-     * @param $param （对应的参数）
+     * 发送阿里云国际版的大陆短信
+     * @param string $template_id 消息模板
+     * @param string $phone
+     * @param array $param （对应的参数）
+     * @return array
+     * @throws ClientException
      */
     public static function sendAlibabacloudMainland($template_id, $phone, $param){
         if(!$template_id) return self::createReturn(false, '', '模板id不能为空');
