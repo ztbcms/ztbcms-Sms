@@ -6,7 +6,7 @@ use Sms\Lib\BaseHelper;
 
 class Helper extends BaseHelper {
 
-    public function send($conf, $to, $param) {
+    public function send($conf, $to, $param,$areaCode) {
         $c = new TopClient;
         $c->appkey = $conf['appkey'];
         $c->secretKey = $conf['secret'];

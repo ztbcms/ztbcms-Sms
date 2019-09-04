@@ -25,7 +25,7 @@ class Helper extends BaseHelper {
      * @param $param  array    短信参数
      * @return mixed
      */
-    function send($conf, $to, $param) {
+    function send($conf, $to, $param,$areaCode) {
         // 加载区域结点配置
         Config::load();
 

@@ -27,9 +27,21 @@
                 <tr>
                     <th><strong>发送参数</strong></th>
                     <td>
+                        <p v-if="
+                        operator == 'alibabacloud_mainland' ||
+                        operator == 'alibabacloud_abroad'
+                        ">
+                            手机区号:<input  v-model="areaCode" type="text" class="input" >
+                        </p>
                         <p>手机号码:<input v-model="phone" type="text" class="input" ></p>
-                        <p>自定义参数：<button @click="clickAddParam" type="button" class="btn btn-success">新增</button></p>
-                        <template v-for="(param, index) in params">
+
+                        <p v-if="operator == 'alibabacloud_abroad'">输入需要发送的消息（阿里云国际版发送国际消息使用）：
+                            <input v-model="abroadMsg" type="text" class="input" >
+                        </p>
+
+
+                        <p v-if = "operator != 'alibabacloud_abroad'">自定义参数：<button @click="clickAddParam" type="button" class="btn btn-success">新增</button></p>
+                        <template v-if = "operator != 'alibabacloud_abroad'" v-for="(param, index) in params">
                             <p>
                                 <input v-model="param.key" type="text" class="input" placeholder="模板变量名">:<input  v-model="param.value" type="text" class="input" placeholder="模板变量值">
                                 <button @click="deleteParam(param, index)" type="button" class="btn btn-danger">删除</button>
@@ -65,7 +77,9 @@
                 operatorData: null,
                 templateData: null,
                 params: [],
-                phone: ''
+                phone: '',
+                areaCode:'',
+                abroadMsg:''
             },
             computed: {
                 previewContent: function(){
@@ -125,7 +139,9 @@
                         phone: that.phone,
                         operator: that.operator,
                         template_id: that.template_id,
-                        param: param_result
+                        param: param_result,
+                        areaCode: that.areaCode,
+                        abroadMsg:that.abroadMsg
                     };
 
                     $.ajax({
