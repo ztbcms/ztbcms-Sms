@@ -397,6 +397,7 @@ class IndexController extends AdminBase {
 
     /**
      * 发送测试短信操作
+     * @throws \AlibabaCloud\Client\Exception\ClientException
      */
     function doTestSend(){
         $template_id = I('post.template_id');
@@ -404,7 +405,7 @@ class IndexController extends AdminBase {
         $operator = I('post.operator');
         $param = I('post.param');
         if($operator == 'alibabacloud_abroad'){
-            //发送阿里云国际版（国籍短信）
+            //发送阿里云国际版（国际短信）
             SmsService::sendAlibabacloudAbroad($template_id,$to,$param);
         } else if($operator == 'alibabacloud_mainland'){
             //发送阿里云国际版（大陆短信）
