@@ -17,8 +17,16 @@ class Helper extends BaseHelper {
 
     const HINTERLAND_PHONE = '86';
 
-    public function send($conf, $to, $param, $areaCode) {
-        if(!$areaCode) return self::createReturn(false, '', '手机区号不能为空','NO');
+    /**
+     * 进行转发操作
+     * @param array $conf
+     * @param string $to
+     * @param array $param
+     * @param $areaCode
+     * @return array|mixed
+     */
+    public function send($conf = [], $to = '', $param = null, $areaCode = '') {
+        if(!$areaCode) return createReturn(false, '', '手机区号不能为空','NO');
         //区分使用大陆短信还是国籍短信
         if($areaCode == self::HINTERLAND_PHONE){
             //发送大陆短信
@@ -37,20 +45,20 @@ class Helper extends BaseHelper {
      * @param $to 手机号码(注意此处手机号码需要带区号)
      * @param $param （对应的参数）
      */
-    public function sendAlibabacloudMainland($conf, $to, $param){
-        if(!$conf) return self::createReturn(false, '', '模板不存在','NO');
-        if(!$to) return self::createReturn(false, '', '电话号码不能为空','NO');
+    public function sendAlibabacloudMainland($conf = [], $to = '', $param = []){
+        if(!$conf) return createReturn(false, '', '模板不存在','NO');
+        if(!$to) return createReturn(false, '', '电话号码不能为空','NO');
         require dirname(dirname(__DIR__)). '/Lib/AlibabaCloud/client/vendor/autoload.php';
-        if ($conf['is_open'] != '1') return self::createReturn(false, '', '该短信服务未开启','NO');
-        if(!$conf['sms_from'] || !$conf['sms_template_code']) return self::createReturn(false, '', '该短信服务未开启','NO');
-        AlibabaCloud::accessKeyClient($conf['access_key_id'], $conf['access_key_secret'])
+        if ($conf['is_open'] != '1') return createReturn(false, '', '该短信服务未开启','NO');
+        if(!$conf['sign'] || !$conf['template']) return createReturn(false, '', '该短信服务未开启','NO');
+        AlibabaCloud::accessKeyClient($conf['access_id'], $conf['access_key'])
             ->regionId('ap-southeast-1')
             ->asGlobalClient();
         $TemplateParam = json_encode($param,true);
         $query = [
             'To' => $to,
-            'From' => $conf['sms_from'], //短信签名
-            'TemplateCode' => $conf['sms_template_code'], //短信内容
+            'From' => $conf['sign'], //短信签名
+            'TemplateCode' => $conf['template'], //短信内容
             'TemplateParam' => $TemplateParam  //短信的内容
         ];
         try {
@@ -66,14 +74,14 @@ class Helper extends BaseHelper {
                 ->request();
             if($result->toArray()['ResponseDescription'] == 'OK'){
                 //发送记录
-                return self::createReturn(true, $result->toArray(), '请求成功','OK');
+                return createReturn(true, $result->toArray(), '请求成功');
             } else {
-                return self::createReturn(false, $result->toArray(), '请求失败','NO');
+                return createReturn(false, $result->toArray(), '请求失败');
             }
         } catch (ClientException $e) {
-            return self::createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败','NO');
+            return createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败');
         } catch (ServerException $e) {
-            return self::createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败','NO');
+            return createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败');
         }
     }
 
@@ -85,14 +93,14 @@ class Helper extends BaseHelper {
      * @return mixed
      * 短信消息发送是否成功可通过 https://sms-intl.console.aliyun.com 登录查看
      */
-    public function sendAlibabacloudAbroad($conf,$phone,$message){
-        if(!$conf) return self::createReturn(false, null, '模板不能为空');
-        if(!$phone) return self::createReturn(false, null, '电话号码不能为空');
+    public function sendAlibabacloudAbroad($conf = [],$phone = '',$message = ''){
+        if(!$conf) return createReturn(false, null, '模板不能为空');
+        if(!$phone) return createReturn(false, null, '电话号码不能为空');
         require dirname(dirname(__DIR__)). '/Lib/AlibabaCloud/client/vendor/autoload.php';
         if ($conf['is_open'] != '1') {
-            return self::createReturn(false, null, '该短信服务未开启');
+            return createReturn(false, null, '该短信服务未开启');
         }
-        AlibabaCloud::accessKeyClient($conf['access_key_id'], $conf['access_key_secret'])
+        AlibabaCloud::accessKeyClient($conf['access_id'], $conf['access_key'])
             ->regionId('ap-southeast-1')
             ->asGlobalClient();
         try {
@@ -110,30 +118,15 @@ class Helper extends BaseHelper {
                 ])->request();
             if($result->toArray()['ResponseCode'] == 'OK'){
                 //发送记录
-                return self::createReturn(true, $result->toArray(), '请求成功','OK');
+                return createReturn(true, $result->toArray(), '请求成功');
             } else {
-                return self::createReturn(false, $result->toArray(), '请求失败','NO');
+                return createReturn(false, $result->toArray(), '请求失败');
             }
         } catch (ClientException $e) {
-            return self::createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败','NO');
+            return createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败');
         } catch (ServerException $e) {
             $log['result'] = $e->getErrorMessage() . PHP_EOL.'请求失败';
-            return self::createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败','NO');
+            return createReturn(false, $e->getErrorMessage() . PHP_EOL, '请求失败');
         }
     }
-
-    static function createReturn($status, $data = [], $msg = '', $code = null, $url = '') {
-        //默认成功则为200 错误则为400
-        if(empty($code)){
-            $code = $status ? 200 : 400;
-        }
-        return [
-            'status' => $status,
-            'code'   => $code,
-            'data'   => $data,
-            'msg'    => $msg,
-            'url'    => $url,
-        ];
-    }
-
 }

@@ -33,7 +33,6 @@ class SmsService extends BaseService {
      */
     public static function sendSms($template, $to, $param = null, $action = 'none', $operator = null,$areaCode = null) {
 
-
         //如果没有传入短信平台，则使用后台配置的开启的短信平台发送
         if (null == $operator) {
             $operator = M('smsOperator')->where("enable='1'")->find()['tablename'];
@@ -57,12 +56,16 @@ class SmsService extends BaseService {
                 $param[$k] = $v . "";
             }
         }
+
+        //查询文件是否存在
         if (file_exists($file)) {
             //导入当前模块下Lib目录下的指定文件
             require_once(PROJECT_PATH . "Application/Sms/Lib/" . ucfirst($operator) . "/Helper.php");
+
             $className = "\\Sms\\Lib\\" . ucfirst($operator) . "\\Helper";
             $helper = new $className();
             $result = json_encode($helper->send($conf, $to, $param, $areaCode));
+
             //发送结果存入数据库
             $log = array(
                 'operator' => $operator,
@@ -75,9 +78,11 @@ class SmsService extends BaseService {
                 'is_used' => self::SEND_STATUS_NO,
                 'action' => $action,
             );
+
             if (M('sms_log')->create($log)) {
                 $sms_log_id = M('sms_log')->add($log);
             }
+
             $data = json_decode($result, true);
             if ($data['Code'] == 'OK' || $data['code'] == 'OK') {
                 if ($sms_log_id) {
@@ -88,6 +93,104 @@ class SmsService extends BaseService {
             } else {
                 $error = $data['msg'];
                 return self::createReturn(false, $error, '发送失败');
+            }
+        } else {
+            return self::createReturn(false, null, '不支持的短信平台');
+        }
+    }
+
+    /**
+     * 发送短信短信
+     * @param string $areaCode
+     * @param string $phone
+     * @param string $alias
+     * @param string $operator
+     * @param array $param
+     * @param int $interval_time
+     * @return array
+     */
+    public static function sendSmsV2(
+        $areaCode = '',$phone = '',$alias = '',
+        $operator = '',$param = [],$interval_time = 0
+    ){
+        //如果没有传入短信平台，则使用后台配置的开启的短信平台发送
+        if (null == $operator) {
+            $operator = M('smsOperator')->where("enable='1'")->find()['tablename'];
+        }
+
+        // 获取短信模板配置
+        $model = M('sms_'.$operator);
+        //使用别名作为唯一标识
+        $conf = $model->where(['alias'=>$alias])->find();
+        if(!$conf) return self::createReturn(false, [], '该方法的别名不存在');
+
+        if($operator == 'alibabacloud_mainland' || $operator == 'alibabacloud_abroad'){
+            //国际版使用同一个模块
+            $operator = 'AlibabaCloud';
+        }
+
+        $logTable = M('sms_log');
+        if($interval_time) {
+            //存在发送限制
+            $historySendtime = $logTable->where([
+                'recv' => $phone,
+                'operator' => $operator,
+                'action' => $alias
+            ])->order('sendtime desc')
+                ->getField('sendtime');
+            if(!$historySendtime) $historySendtime = 0;
+            if(time() - $historySendtime < $interval_time) {
+                return self::createReturn(false, [], '对不起，你的短信不能频发的进行发送');
+            }
+        }
+
+        //检查是否存在指定的文件
+        $file = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR."Lib".DIRECTORY_SEPARATOR.ucfirst($operator) . DIRECTORY_SEPARATOR. "Helper.php";
+
+        // 保证所有的参数都是字符串类型
+        if (is_array($param)) {
+            foreach ($param as $k => $v) {
+                $param[$k] = $v . "";
+            }
+        }
+
+        //查询文件是否存在
+        if (file_exists($file)) {
+            //导入当前模块下Lib目录下的指定文件
+            require_once(PROJECT_PATH . "Application/Sms/Lib/" . ucfirst($operator) . "/Helper.php");
+
+            $className = "\\Sms\\Lib\\" . ucfirst($operator) . "\\Helper";
+            $helper = new $className();
+            $result = $helper->send($conf, $phone, $param, $areaCode);
+
+            //发送结果存入数据库
+            $log = array(
+                'operator' => $operator,
+                'template' => json_encode($conf),
+                'recv' => $phone,
+                'param' => is_array($param) ? json_encode($param) : $param,
+                'sendtime' => time(),
+                'result' => json_encode($result['data']),
+                'send_status' => self::SEND_STATUS_NO,
+                'is_used' => self::SEND_STATUS_NO,
+                'action' => $alias,
+            );
+
+            if ($logTable->create($log)) {
+                $sms_log_id = $logTable->add($log);
+            }
+
+            if ($result['status']) {
+                if ($sms_log_id) {
+                    //发送状态 => 成功
+                    $logTable->where(['id' => $sms_log_id])
+                        ->save([
+                            'send_status' => self::SEND_STATUS_YES
+                        ]);
+                }
+                return self::createReturn(true, [], '发送成功');
+            } else {
+                return self::createReturn(false, $result['data'], $result['msg']);
             }
         } else {
             return self::createReturn(false, null, '不支持的短信平台');
