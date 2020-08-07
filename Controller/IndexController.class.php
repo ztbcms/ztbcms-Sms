@@ -317,20 +317,15 @@ class IndexController extends AdminBase {
      * 修改模板
      */
     public function module_edit() {
-
         if (IS_POST) {
-
             //去除多余的空格字符
             foreach ($_POST as $k => $v) {
                 $_POST[$k] = trim($v);
             }
-
             $tableName = "sms_" . I('post.operator', NULL);
             unset($_POST['operator']);
-
             try {
                 $Model = M($tableName);
-
                 if (FALSE !== $Model->save($_POST)) {
                     $this->ajaxReturn(array(
                         'status' => TRUE,
@@ -342,7 +337,6 @@ class IndexController extends AdminBase {
                     ));
                 }
             } catch (\Exception $e) {
-
                 $this->ajaxReturn(array(
                     'status' => FALSE,
                     'error' => $e->getMessage(),
@@ -411,4 +405,26 @@ class IndexController extends AdminBase {
         $res = SmsService::sendSms($template_id, $to, $param, 'test', $operator,$areaCode);
         $this->ajaxReturn($res);
     }
+
+    /**
+     * 发送测试短信操作V2升级版
+     */
+    function doTestSendV2(){
+        //区号
+        $areaCode = I('post.areaCode','','trim');
+        //手机号
+        $phone = I('post.phone');
+        //别名 （例：register 注册 login 登录）
+        $alias = I('alias','','trim');
+        //平台 （例: aliyun 阿里云短信 ）
+        $operator = I('post.operator');
+        //参数
+        $param = I('post.param');
+        //间隔时间 （秒 0为不进行限制）
+        $interval_time = 0;
+
+        $res = SmsService::sendSmsV2($areaCode,$phone,$alias,$operator,$param,$interval_time);
+        $this->ajaxReturn($res);
+    }
+
 }

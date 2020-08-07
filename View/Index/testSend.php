@@ -33,6 +33,7 @@
                         ">
                             手机区号:<input  v-model="areaCode" type="text" class="input" >
                         </p>
+
                         <p>手机号码:<input v-model="phone" type="text" class="input" ></p>
 
                         <p v-if="operator == 'alibabacloud_abroad'">输入需要发送的消息（阿里云国际版发送国际消息使用）：
@@ -79,7 +80,8 @@
                 params: [],
                 phone: '',
                 areaCode:'',
-                abroadMsg:''
+                abroadMsg:'',
+                alias : ''
             },
             computed: {
                 previewContent: function(){
@@ -109,6 +111,7 @@
                             if(res.status){
                                 that.operatorData = res.data;
                                 that.templateData = res.data.modules;
+                                that.alias = res.data.modules.alias;
                             }
                         }
                     })
@@ -130,22 +133,52 @@
                             return;
                         }
                     }
+
                     var param_result = {};
-                    this.params.forEach(function(param){
-                        param_result[param.key] = param.value;
-                    });
+
+                    if(this.operator !== 'alibabacloud_abroad') {
+                        this.params.forEach(function(param){
+                            param_result[param.key] = param.value;
+                        });
+                    } else {
+                        param_result = this.abroadMsg;
+                    }
+
+
+
+                    // var data = {
+                    //     phone: that.phone,
+                    //     operator: that.operator,
+                    //     template_id: that.template_id,
+                    //     param: param_result,
+                    //     areaCode: that.areaCode,
+                    //     abroadMsg:that.abroadMsg
+                    // };
+                    //
+                    // $.ajax({
+                    //     url: "{:U('Sms/Index/doTestSend')}",
+                    //     type: 'post',
+                    //     data: data,
+                    //     dataType: 'json',
+                    //     success: function(res){
+                    //         if(res.status){
+                    //             layer.msg('发送操作完成');
+                    //         }else{
+                    //             layer.msg('网络繁忙,请稍后再试');
+                    //         }
+                    //     }
+                    // });
 
                     var data = {
+                        areaCode:that.areaCode,
                         phone: that.phone,
+                        alias: that.alias,
                         operator: that.operator,
-                        template_id: that.template_id,
-                        param: param_result,
-                        areaCode: that.areaCode,
-                        abroadMsg:that.abroadMsg
+                        param: param_result
                     };
 
                     $.ajax({
-                        url: "{:U('Sms/Index/doTestSend')}",
+                        url: "{:U('Sms/Index/doTestSendV2')}",
                         type: 'post',
                         data: data,
                         dataType: 'json',
@@ -153,7 +186,7 @@
                             if(res.status){
                                 layer.msg('发送操作完成');
                             }else{
-                                layer.msg('网络繁忙,请稍后再试');
+                                layer.msg(res.msg);
                             }
                         }
                     });

@@ -15,7 +15,8 @@ use Aliyun\Core\DefaultAcsClient;
 use Aliyun\Core\Profile\DefaultProfile;
 use Sms\Lib\BaseHelper;
 
-class Helper extends BaseHelper {
+class Helper extends BaseHelper
+{
 
     /**
      * 短信发送
@@ -25,7 +26,8 @@ class Helper extends BaseHelper {
      * @param $param  array    短信参数
      * @return mixed
      */
-    function send($conf, $to, $param,$areaCode) {
+    function send($conf, $to, $param, $areaCode = 86)
+    {
         // 加载区域结点配置
         Config::load();
 
@@ -63,17 +65,19 @@ class Helper extends BaseHelper {
         $request->setTemplateCode($conf['template']);
 
         // 可选，设置模板参数
-        if($param) {
+        if ($param) {
             $request->setTemplateParam(json_encode($param));
         }
-
         // 发起访问请求
         $acsResponse = $acsClient->getAcsResponse($request);
+        $acsResponse = json_encode($acsResponse);
+        $acsResponse = json_decode($acsResponse, true);
 
-        // 打印请求结果
-//         var_dump($acsResponse);
-
-         return $acsResponse;
-
+        // 统一返回的格式
+        if($acsResponse['Message'] == 'OK'){
+            return createReturn(true,$acsResponse,'发送成功');
+        } else {
+            return createReturn(false,$acsResponse,$acsResponse['Message']);
+        }
     }
 }
